@@ -9,6 +9,10 @@
   (testing "system properties"
     (is (= (:user-name env) (System/getProperty "user.name")))
     (is (= (:user-country env) (System/getProperty "user.country"))))
+  (testing "properties file"
+    (spit ".properties" "some.prop=some_value")
+    (use 'environ.core :reload)
+    (is (= (:some-prop env) "some_value")))
   (testing "env file"
     (spit ".lein-env" (prn-str {:foo "bar"}))
     (use 'environ.core :reload)

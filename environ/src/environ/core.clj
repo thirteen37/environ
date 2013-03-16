@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]))
 
+
 (defn- keywordize [s]
   (-> (str/lower-case s)
       (str/replace "_" "-")
@@ -23,6 +24,14 @@
        (map (fn [[k v]] [(keywordize k) v]))
        (into {})))
 
+(defn- read-property-file []
+  (let [prop-file (io/file ".properties")]
+    (if (.exists prop-file)
+      (->> (doto (java.util.Properties.)
+             (.load (io/reader ".properties")))
+           (map (fn [[k v]] [(keywordize k) v]))
+           (into {})))))
+
 (defn- read-env-file []
   (let [env-file (io/file ".lein-env")]
     (if (.exists env-file)
@@ -32,6 +41,7 @@
 (def ^{:doc "A map of environment variables."}
   env
   (merge
+   (read-property-file)
    (read-env-file)
    (read-system-props)
    (read-system-env)))
